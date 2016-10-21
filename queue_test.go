@@ -15,20 +15,20 @@ func TestQueue_Do(t *testing.T) {
 	finish := make(chan bool)
 	start := make(chan bool)
 
-	getter := func(param Param) (Result, error) {
+	getter := func(param Keys) (Result, error) {
 		result := <-results
 		return result, nil
 	}
 
 	go func() {
 		start <- true
-		actual1, _ = q.Do(1, nil, getter)
+		actual1, _ = q.Do(nil, getter, 1)
 		finish <- true
 	}()
 	<-start
 	go func() {
 		start <- true
-		actual2, _ = q.Do(1, nil, getter)
+		actual2, _ = q.Do(nil, getter, 1)
 		finish <- true
 	}()
 	<-start

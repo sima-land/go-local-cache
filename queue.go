@@ -24,14 +24,14 @@ type call struct {
 	err error
 }
 
-// Do place call with queue of calls with same key and return results of call.
-// Actually only one getter will be called at the same time
-func (q *Queue) Do(key interface{}, param Param, getter Getter) (Result, error) {
+// Do place call in queue of calls with same queueKey
+// and returns results of first call in queue
+func (q *Queue) Do(keys Keys, getter Getter, queueKey interface{}) (Result, error) {
 	q.mu.Lock()
 	if q.calls == nil {
 		q.calls = make(map[interface{}]*call)
 	}
-	if c, ok := q.calls[key]; ok {
+	if c, ok := q.calls[queueKey]; ok {
 		q.mu.Unlock()
 		c.wg.Wait()
 		return c.res, c.err
@@ -39,13 +39,13 @@ func (q *Queue) Do(key interface{}, param Param, getter Getter) (Result, error) 
 
 	c := new(call)
 	c.wg.Add(1)
-	q.calls[key] = c
+	q.calls[queueKey] = c
 	q.mu.Unlock()
-	c.res, c.err = getter(param)
+	c.res, c.err = getter(keys)
 	c.wg.Done()
 
 	q.mu.Lock()
-	delete(q.calls, key)
+	delete(q.calls, queueKey)
 	q.mu.Unlock()
 
 	return c.res, c.err
