@@ -3,6 +3,7 @@
 Implementation of simple local cache.
 
 [![Build Status](https://travis-ci.org/sima-land/go-local-cache.svg?branch=master)](https://travis-ci.org/sima-land/go-local-cache)
+[![Go Report Card](https://goreportcard.com/badge/github.com/sima-land/go-local-cache)](https://goreportcard.com/report/github.com/sima-land/go-local-cache)
 
 Features & todos:
 - [x] prevents "dogpile effect"
