@@ -8,8 +8,8 @@ import (
 func TestQueue_Do(t *testing.T) {
 	q := NewQueue()
 	var actual1, actual2 Result
-	sample1 := Result{1 : true}
-	sample2 := Result{1 : false}
+	sample1 := Result{1: true}
+	sample2 := Result{1: false}
 
 	results := make(chan Result, 2)
 	finish := make(chan bool)

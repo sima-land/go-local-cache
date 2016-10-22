@@ -29,9 +29,8 @@ func New() *Cache {
 	c := Cache{}
 	c.data = make(Result)
 	c.queue = NewQueue()
-	return &c;
+	return &c
 }
-
 
 // Get returns data from cache by keys
 //
