@@ -11,7 +11,8 @@ func NewQueue() *Queue {
 	return &q
 }
 
-// Queue of calls. Allows to prevent go pile effect
+// Queue of calls. Provides a duplicate function call suppression mechanism.
+// Based on google group cache singleflight package.
 type Queue struct {
 	mu    sync.Mutex
 	calls map[interface{}]*call
