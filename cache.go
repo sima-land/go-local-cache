@@ -3,6 +3,7 @@ package cache
 import (
 	"container/list"
 	"sync"
+	"time"
 )
 
 // Getter func must be implemented by client and returns data by it's keys
@@ -19,12 +20,14 @@ type Keys []int
 
 type entry struct {
 	key   int
+	exp   time.Time
 	value interface{}
 }
 
 // Options keeps cache options
 type Options struct {
 	MaxEntries int
+	TTL        time.Duration
 }
 
 // Cache represents cache
@@ -61,10 +64,15 @@ func (c *Cache) Get(keys Keys, getter Getter, queueKey interface{}) (Result, err
 	result := make(Result)
 	missedKeys := make(Keys, 0)
 	c.mu.Lock()
+	now := time.Now()
 	for _, key := range keys {
 		if e, ok := c.data[key]; ok {
-			c.ll.MoveToFront(e)
-			result[key] = e.Value.(*entry).value
+			if c.opt.TTL > 0 && now.After(e.Value.(*entry).exp) {
+				missedKeys = append(missedKeys, key)
+			} else {
+				c.ll.MoveToFront(e)
+				result[key] = e.Value.(*entry).value
+			}
 		} else {
 			missedKeys = append(missedKeys, key)
 		}
@@ -86,13 +94,14 @@ func (c *Cache) Get(keys Keys, getter Getter, queueKey interface{}) (Result, err
 
 // Set saves result into cache
 func (c *Cache) Set(data Result) {
+	exp := time.Now().Add(c.opt.TTL)
 	c.mu.Lock()
 	for k, v := range data {
 		if e, ok := c.data[k]; ok {
 			c.ll.MoveToFront(e)
 			e.Value.(*entry).value = v
 		} else {
-			c.data[k] = c.ll.PushFront(&entry{key: k, value: v})
+			c.data[k] = c.ll.PushFront(&entry{key: k, value: v, exp: exp})
 		}
 	}
 	c.mu.Unlock()
