@@ -39,3 +39,12 @@ result, err := c.Get(int[]{1,2,3,4}, getter, 2)
 
 ```
 
+## Test
+
+MacBook 2,7 GHz Intel Core i5
+
+```
+BenchmarkCache_Get-4      500000              2274 ns/op
+BenchmarkCache_Get-4      500000              2335 ns/op
+```
+
