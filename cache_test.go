@@ -42,14 +42,17 @@ func TestCache_TTL(t *testing.T) {
 
 	c := New(Options{TTL:ttl})
 	c.Set(Result{1: 10, 2: 20})
+	expectedTTL := c.data[1].Value.(*entry).exp.UnixNano()
 	r, _ := c.Get([]int{1, 2}, getter, 1)
 	require.Equal(t, 10, r[1])
 	require.Equal(t, 20, r[2])
 
 	time.Sleep(ttl)
 	r, _ = c.Get([]int{1, 2}, getter, 1)
+	actualTTL := c.data[1].Value.(*entry).exp.UnixNano()
 	require.Equal(t, 1, r[1])
 	require.Equal(t, 2, r[2])
+	require.NotEqual(t, expectedTTL, actualTTL)
 }
 
 func BenchmarkCache_Get(b *testing.B) {

@@ -100,6 +100,7 @@ func (c *Cache) Set(data Result) {
 		if e, ok := c.data[k]; ok {
 			c.ll.MoveToFront(e)
 			e.Value.(*entry).value = v
+			e.Value.(*entry).exp = exp
 		} else {
 			c.data[k] = c.ll.PushFront(&entry{key: k, value: v, exp: exp})
 		}
